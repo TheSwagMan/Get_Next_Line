@@ -6,7 +6,7 @@
 /*   By: tpotier <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/05 18:34:43 by tpotier           #+#    #+#             */
-/*   Updated: 2019/04/09 00:37:32 by tpotier          ###   ########.fr       */
+/*   Updated: 2019/04/09 01:14:25 by tpotier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,6 @@ int		get_next_line(const int fd, char **line)
 {
 	static char	*rest = NULL;
 	char		buff[BUFF_SIZE + 1];
-	int			n;
 	size_t		s;
 
 	*line = NULL;
@@ -76,11 +75,11 @@ int		get_next_line(const int fd, char **line)
 			strcpy(buff, rest);
 			free(rest);
 			rest = NULL;
-			n = ft_strlen(buff);
+			s = ft_strlen(buff);
 		}
 		else
-			n = read(fd, buff, BUFF_SIZE);
-		buff[n] = '\0';
+			s = read(fd, buff, BUFF_SIZE);
+		buff[s] = '\0';
 		if (strlen_bfrchr(buff, '\n', &s))
 		{
 			buff[s] = '\0';

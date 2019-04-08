@@ -1,30 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tpotier <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/04/05 18:35:08 by tpotier           #+#    #+#             */
-/*   Updated: 2019/04/08 23:05:39 by tpotier          ###   ########.fr       */
+/*   Created: 2019/04/05 18:57:17 by tpotier           #+#    #+#             */
+/*   Updated: 2019/04/09 00:41:46 by tpotier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#include "get_next_line.h"
 
-# include <unistd.h>
-# include <string.h>
-# include "libft.h"
+#include <stdio.h>
 
-# define BUFF_SIZE 32
 
-typedef struct	s_fb
+
+int		strncat_mal(char **s1, char *s2, size_t n);
+int	main(void)
 {
-	char		*buff;
-	int			fd;
-}				t_fb;
+	char	*s;
 
-int				get_next_line(const int fd, char **line);
-
-#endif
+	while (get_next_line(0, &s) > 0)
+	{
+		ft_putendl(s);
+	}
+	ft_putstr("ok");
+	return (0);
+}

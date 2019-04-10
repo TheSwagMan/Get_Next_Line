@@ -6,7 +6,7 @@
 /*   By: tpotier <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/05 18:34:43 by tpotier           #+#    #+#             */
-/*   Updated: 2019/04/10 17:23:54 by tpotier          ###   ########.fr       */
+/*   Updated: 2019/04/10 18:56:55 by tpotier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,36 +66,35 @@ int		strncat_mal(char **s1, char *s2, size_t n)
 ** found.
 */
 
-t_fb	*get_corresponding_fd(t_list **l, int fd)
+void	set_fd(t_list **l, char *str, int fd)
 {
 	t_list	*li;
 	t_list	*new;
 
 	if (!l)
-		return (NULL);
-	li = *l;
-	while (li)
-	{
-		if (((t_fb *)(li->content))->fd == fd)
-			return (li->content);
-		li = li->next;
-	}
+		return ;
 	if (!(new = (t_list *)malloc(sizeof(*new))))
-		return (NULL);
+		return ;
 	new->next = NULL;
 	if (!(new->content = (t_fb *)malloc(sizeof(t_fb))))
-		return (NULL);
+	{
+		free(new);
+		return ;
+	}
 	((t_fb *)(new->content))->fd = fd;
-	((t_fb *)(new->content))->buff = NULL;
+	((t_fb *)(new->content))->buff = str;
 	li = *l;
 	if (!*l)
-		return ((*l = new)->content);
-	while (li && li->next)
-		li = li->next;
-	return ((li->next = new)->content);
+		*l = new;
+	else
+	{
+		while (li->next)
+			li = li->next;
+		li->next = new;
+	}
 }
 
-char	*del_corresponding_f(t_list *l, int fd)
+char	*del_fd(t_list *l, int fd)
 {
 	t_list	*prev;
 	char	*s;
@@ -127,45 +126,49 @@ ssize_t	get_fd_str(char **str, t_list *l, int fd)
 	char		buff[BUFF_SIZE + 1];
 	ssize_t		size;
 
-	*str = del_corresponding_f(l, fd);
+	*str = del_fd(l, fd);
 	if (*str)
 		return (ft_strlen(*str));
 	size = read(fd, buff, BUFF_SIZE);
-	strncat_mal(
+	buff[size] = '\0';
+	*str = ft_strdup(buff);
 	return (size);
 }
 
 int		get_next_line(const int fd, char **line)
 {
-	static char	*rest = NULL;
-	ssize_t		s;
+	static t_list	*states = NULL;
+	ssize_t			s;
+	char			*str;
 
 	*line = NULL;
+	str = NULL;
 	while (1)
 	{
-		if (rest)
-		{
-			strcpy(buff, rest);
-			free(rest);
-			rest = NULL;
-			s = ft_strlen(buff);
-		}
-		else
-			s = read(fd, buff, BUFF_SIZE);
+		s = get_fd_str(&str, states, fd);
 		if (s < 0)
 			return (-1);
-		buff[s] = '\0';
-		if (strlen_bfrchr(buff, '\n', (size_t *)&s))
+		if (strlen_bfrchr(str, '\n', (size_t *)&s))
 		{
-			buff[s] = '\0';
-			rest = ft_strdup(buff + s + 1);
-			if (!strncat_mal(line, buff, (size_t)s))
+			str[s] = '\0';
+			set_fd(&states, ft_strdup(str + s + 1), fd);
+			if (!strncat_mal(line, str, (size_t)s))
+			{
+				free(str);
 				return (-1);
+			}
+			free(str);
 			return (1);
 		}
 		if (s == 0)
+		{
+			free(str);
 			return (0);
-		if (!strncat_mal(line, buff, s))
+		}
+		if (!strncat_mal(line, str, s))
+		{
+			free(str);
 			return (-1);
+		}
 	}
 }

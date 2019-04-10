@@ -6,7 +6,7 @@
 /*   By: tpotier <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/05 18:34:43 by tpotier           #+#    #+#             */
-/*   Updated: 2019/04/09 01:14:25 by tpotier          ###   ########.fr       */
+/*   Updated: 2019/04/10 17:23:54 by tpotier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,11 +61,84 @@ int		strncat_mal(char **s1, char *s2, size_t n)
 	return (1);
 }
 
+/*
+** Return the a pointer on the fd corresponding to fd, and create one if none is
+** found.
+*/
+
+t_fb	*get_corresponding_fd(t_list **l, int fd)
+{
+	t_list	*li;
+	t_list	*new;
+
+	if (!l)
+		return (NULL);
+	li = *l;
+	while (li)
+	{
+		if (((t_fb *)(li->content))->fd == fd)
+			return (li->content);
+		li = li->next;
+	}
+	if (!(new = (t_list *)malloc(sizeof(*new))))
+		return (NULL);
+	new->next = NULL;
+	if (!(new->content = (t_fb *)malloc(sizeof(t_fb))))
+		return (NULL);
+	((t_fb *)(new->content))->fd = fd;
+	((t_fb *)(new->content))->buff = NULL;
+	li = *l;
+	if (!*l)
+		return ((*l = new)->content);
+	while (li && li->next)
+		li = li->next;
+	return ((li->next = new)->content);
+}
+
+char	*del_corresponding_f(t_list *l, int fd)
+{
+	t_list	*prev;
+	char	*s;
+
+	prev = NULL;
+	while (l)
+	{
+		if (((t_fb *)l->content)->fd == fd)
+		{
+			if (!prev)
+				prev = l;
+			if (prev->next && prev->next->next)
+				prev->next = prev->next->next;
+			else
+				prev->next = NULL;
+			s = ((t_fb *)l->content)->buff;
+			free(l->content);
+			free(l);
+			return (s);
+		}
+		prev = l;
+		l = l->next;
+	}
+	return (NULL);
+}
+
+ssize_t	get_fd_str(char **str, t_list *l, int fd)
+{
+	char		buff[BUFF_SIZE + 1];
+	ssize_t		size;
+
+	*str = del_corresponding_f(l, fd);
+	if (*str)
+		return (ft_strlen(*str));
+	size = read(fd, buff, BUFF_SIZE);
+	strncat_mal(
+	return (size);
+}
+
 int		get_next_line(const int fd, char **line)
 {
 	static char	*rest = NULL;
-	char		buff[BUFF_SIZE + 1];
-	size_t		s;
+	ssize_t		s;
 
 	*line = NULL;
 	while (1)
@@ -79,12 +152,14 @@ int		get_next_line(const int fd, char **line)
 		}
 		else
 			s = read(fd, buff, BUFF_SIZE);
+		if (s < 0)
+			return (-1);
 		buff[s] = '\0';
-		if (strlen_bfrchr(buff, '\n', &s))
+		if (strlen_bfrchr(buff, '\n', (size_t *)&s))
 		{
 			buff[s] = '\0';
 			rest = ft_strdup(buff + s + 1);
-			if (!strncat_mal(line, buff, s))
+			if (!strncat_mal(line, buff, (size_t)s))
 				return (-1);
 			return (1);
 		}

@@ -6,7 +6,7 @@
 /*   By: tpotier <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/05 18:34:43 by tpotier           #+#    #+#             */
-/*   Updated: 2019/04/10 18:56:55 by tpotier          ###   ########.fr       */
+/*   Updated: 2019/04/12 18:36:28 by tpotier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,38 +90,41 @@ void	set_fd(t_list **l, char *str, int fd)
 	{
 		while (li->next)
 			li = li->next;
+		ft_putendl("OKK");
 		li->next = new;
 	}
 }
 
-char	*del_fd(t_list *l, int fd)
+char	*del_fd(t_list **l, int fd)
 {
 	t_list	*prev;
 	char	*s;
+	t_list	*c;
 
 	prev = NULL;
-	while (l)
+	while (l && *l)
 	{
-		if (((t_fb *)l->content)->fd == fd)
+		if (((t_fb *)(*l)->content)->fd == fd)
 		{
-			if (!prev)
-				prev = l;
-			if (prev->next && prev->next->next)
-				prev->next = prev->next->next;
-			else
-				prev->next = NULL;
-			s = ((t_fb *)l->content)->buff;
-			free(l->content);
-			free(l);
+			if (prev) {
+				if (prev->next && prev->next->next)
+					prev->next = prev->next->next;
+				else
+					prev->next = NULL;
+			}
+			s = ((t_fb *)(*l)->content)->buff;
+			free((*l)->content);
+			free(*l);
+			*l = NULL;
 			return (s);
 		}
-		prev = l;
-		l = l->next;
+		prev = *l;
+		*l = (*l)->next;
 	}
 	return (NULL);
 }
 
-ssize_t	get_fd_str(char **str, t_list *l, int fd)
+ssize_t	get_fd_str(char **str, t_list **l, int fd)
 {
 	char		buff[BUFF_SIZE + 1];
 	ssize_t		size;
@@ -145,13 +148,14 @@ int		get_next_line(const int fd, char **line)
 	str = NULL;
 	while (1)
 	{
-		s = get_fd_str(&str, states, fd);
+		s = get_fd_str(&str, &states, fd);
 		if (s < 0)
 			return (-1);
 		if (strlen_bfrchr(str, '\n', (size_t *)&s))
 		{
 			str[s] = '\0';
 			set_fd(&states, ft_strdup(str + s + 1), fd);
+			ft_putendl("ok");
 			if (!strncat_mal(line, str, (size_t)s))
 			{
 				free(str);

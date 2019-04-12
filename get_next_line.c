@@ -6,7 +6,7 @@
 /*   By: tpotier <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/05 18:34:43 by tpotier           #+#    #+#             */
-/*   Updated: 2019/04/12 21:06:19 by tpotier          ###   ########.fr       */
+/*   Updated: 2019/04/12 22:58:43 by tpotier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,9 +65,10 @@ char	*del_fd(t_list **l, int fd)
 
 ssize_t	get_fd_str(char **str, t_list **l, int fd)
 {
-	char		buff[BUFF_SIZE + 1];
+	char		*buff;
 	ssize_t		size;
 
+	buff = (char *)malloc((BUFF_SIZE + 1) * sizeof(*buff));
 	*str = del_fd(l, fd);
 	if (*str)
 		return (ft_strlen(*str));
@@ -91,12 +92,11 @@ int		get_next_line(const int fd, char **line)
 	{
 		if ((s = get_fd_str(&str, &states, fd)) < 0)
 			to_ret = -1;
-		if (ft_strlen_bfrchr(str, '\n', (size_t *)&s))
+		if (to_ret == 10 && ft_strlen_bfrchr(str, '\n', (size_t *)&s))
 		{
 			str[s] = '\0';
 			set_fd(&states, ft_strdup(str + s + 1), fd);
-			to_ret = ft_strncat_mal(line, str, (size_t)s) ? to_ret : -1;
-			to_ret = to_ret == 10 ? 1 : to_ret;
+			to_ret = ft_strncat_mal(line, str, (size_t)s) ? 1 : -1;
 		}
 		to_ret = (to_ret == 10 && s == 0) ? 0 : to_ret;
 		to_ret = (to_ret == 10 && !ft_strncat_mal(line, str, s)) ? -1 : to_ret;

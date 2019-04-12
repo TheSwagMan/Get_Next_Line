@@ -6,7 +6,7 @@
 /*   By: tpotier <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/05 18:34:43 by tpotier           #+#    #+#             */
-/*   Updated: 2019/04/12 20:29:44 by tpotier          ###   ########.fr       */
+/*   Updated: 2019/04/12 21:06:19 by tpotier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,35 +82,26 @@ int		get_next_line(const int fd, char **line)
 	static t_list	*states = NULL;
 	ssize_t			s;
 	char			*str;
+	int				to_ret;
 
 	*line = NULL;
 	str = NULL;
+	to_ret = 10;
 	while (1)
 	{
-		s = get_fd_str(&str, &states, fd);
-		if (s < 0)
-			return (-1);
+		if ((s = get_fd_str(&str, &states, fd)) < 0)
+			to_ret = -1;
 		if (ft_strlen_bfrchr(str, '\n', (size_t *)&s))
 		{
 			str[s] = '\0';
 			set_fd(&states, ft_strdup(str + s + 1), fd);
-			if (!ft_strncat_mal(line, str, (size_t)s))
-			{
-				free(str);
-				return (-1);
-			}
-			free(str);
-			return (1);
+			to_ret = ft_strncat_mal(line, str, (size_t)s) ? to_ret : -1;
+			to_ret = to_ret == 10 ? 1 : to_ret;
 		}
-		if (s == 0)
-		{
-			free(str);
-			return (0);
-		}
-		if (!ft_strncat_mal(line, str, s))
-		{
-			free(str);
-			return (-1);
-		}
+		to_ret = (to_ret == 10 && s == 0) ? 0 : to_ret;
+		to_ret = (to_ret == 10 && !ft_strncat_mal(line, str, s)) ? -1 : to_ret;
+		(void)(to_ret != 10 ? free(str) : 0);
+		if (to_ret != 10)
+			return (to_ret);
 	}
 }

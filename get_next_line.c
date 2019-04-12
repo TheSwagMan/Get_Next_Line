@@ -6,7 +6,7 @@
 /*   By: tpotier <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/05 18:34:43 by tpotier           #+#    #+#             */
-/*   Updated: 2019/04/12 22:58:43 by tpotier          ###   ########.fr       */
+/*   Updated: 2019/04/13 01:21:36 by tpotier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,19 +63,30 @@ char	*del_fd(t_list **l, int fd)
 	return (s);
 }
 
-ssize_t	get_fd_str(char **str, t_list **l, int fd)
+int		get_fd_str(char **str, t_list **l, int fd, ssize_t *s)
 {
 	char		*buff;
 	ssize_t		size;
 
-	buff = (char *)malloc((BUFF_SIZE + 1) * sizeof(*buff));
 	*str = del_fd(l, fd);
 	if (*str)
-		return (ft_strlen(*str));
+	{
+		*s = ft_strlen(*str);
+		return (0);
+	}
+	buff = (char *)malloc((BUFF_SIZE + 1) * sizeof(*buff));
 	size = read(fd, buff, BUFF_SIZE);
+	if (size < 0)
+	{
+		free(buff);
+		return (-1);
+	}
 	buff[size] = '\0';
 	*str = ft_strdup(buff);
-	return (size);
+	free(buff);
+	if (size == BUFF_SIZE)
+		return (0);
+	return (1);
 }
 
 int		get_next_line(const int fd, char **line)
@@ -83,25 +94,25 @@ int		get_next_line(const int fd, char **line)
 	static t_list	*states = NULL;
 	ssize_t			s;
 	char			*str;
-	int				to_ret;
+	int				eof;
 
 	*line = NULL;
 	str = NULL;
-	to_ret = 10;
 	while (1)
 	{
-		if ((s = get_fd_str(&str, &states, fd)) < 0)
-			to_ret = -1;
-		if (to_ret == 10 && ft_strlen_bfrchr(str, '\n', (size_t *)&s))
+		if ((eof = get_fd_str(&str, &states, fd, &s)) < 0)
+			return (-1);
+		if (eof && s == 0)
+			return (0);
+		if (ft_strlen_bfrchr(str, '\n', (size_t *)&s))
 		{
 			str[s] = '\0';
+			eof = 1;
 			set_fd(&states, ft_strdup(str + s + 1), fd);
-			to_ret = ft_strncat_mal(line, str, (size_t)s) ? 1 : -1;
 		}
-		to_ret = (to_ret == 10 && s == 0) ? 0 : to_ret;
-		to_ret = (to_ret == 10 && !ft_strncat_mal(line, str, s)) ? -1 : to_ret;
-		(void)(to_ret != 10 ? free(str) : 0);
-		if (to_ret != 10)
-			return (to_ret);
+		ft_strncat_mal(line, str, (size_t)s);
+		free(str);
+		if (eof)
+			return (1);
 	}
 }

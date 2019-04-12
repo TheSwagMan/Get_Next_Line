@@ -6,7 +6,7 @@
 /*   By: tpotier <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/02 19:08:22 by tpotier           #+#    #+#             */
-/*   Updated: 2019/04/12 19:54:54 by tpotier          ###   ########.fr       */
+/*   Updated: 2019/04/12 20:22:50 by tpotier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,8 @@ char				*ft_strsub(char const *s, unsigned int start, size_t len);
 char				*ft_strjoin(char const *s1, char const *s2);
 char				*ft_strtrim(char const *s);
 char				**ft_strsplit(char const *s, char c);
+int					ft_strlen_bfrchr(char *s, char c, size_t *size);
+int					ft_strncat_mal(char **s1, char *s2, size_t n);
 
 void				ft_putchar_fd(char c, int fd);
 void				ft_putchar(char c);
@@ -85,7 +87,8 @@ void				ft_lstdel(t_list **alst, void (*del)(void *, size_t));
 void				ft_lstadd(t_list **alst, t_list *new);
 void				ft_lstiter(t_list *lst, void (*f)(t_list *elem));
 t_list				*ft_lstmap(t_list *lst, t_list *(*f)(t_list *elem));
-void				*ft_lstdelif(t_list **alst, int (*cond)(void *, size_t),
-						void (*del)(void *, size_t));
+void				*ft_lstdelif(t_list **alst,
+						int (*cond)(void *, size_t, void *),
+						void *comp, void (*del)(void *, size_t));
 
 #endif

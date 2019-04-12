@@ -6,7 +6,7 @@
 #    By: tpotier <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/04/01 16:36:41 by tpotier           #+#    #+#              #
-#    Updated: 2019/04/12 19:52:41 by tpotier          ###   ########.fr        #
+#    Updated: 2019/04/12 20:22:00 by tpotier          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ FILES = ft_memset ft_bzero ft_memcpy ft_memccpy ft_memmove ft_memchr \
 		ft_isascii ft_isprint ft_toupper ft_tolower \
 		ft_memalloc ft_memdel ft_strnew ft_strdel ft_strclr ft_striter \
 		ft_striteri ft_strmap ft_strmapi ft_strequ ft_strnequ ft_strsub \
-		ft_strjoin ft_strtrim ft_strsplit \
+		ft_strjoin ft_strtrim ft_strsplit ft_strncat_mal ft_strlen_bfrchr \
 		ft_putchar_fd ft_putchar ft_putstr_fd ft_putstr ft_putendl_fd \
 		ft_putendl ft_putnbr_fd ft_putnbr ft_itoa \
 		ft_lstnew ft_lstdelone ft_lstdel ft_lstadd ft_lstiter ft_lstmap \
@@ -26,7 +26,7 @@ FILES = ft_memset ft_bzero ft_memcpy ft_memccpy ft_memmove ft_memchr \
 IFILES = libft.h
 NAME = libft.a
 SDIR = srcs/
-IDIR = incs/
+IDIR = includes/
 
 CFLAGS = -Wall -Wextra -Werror -I$(IDIR) -MMD -MP
 

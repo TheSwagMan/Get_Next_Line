@@ -6,60 +6,11 @@
 /*   By: tpotier <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/05 18:34:43 by tpotier           #+#    #+#             */
-/*   Updated: 2019/04/12 18:36:28 by tpotier          ###   ########.fr       */
+/*   Updated: 2019/04/12 20:29:44 by tpotier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
-/*
-** Get the size of a given str until occurence of char c
-** Returns 1 if the char is found else 0
-*/
-
-int		strlen_bfrchr(char *s, char c, size_t *size)
-{
-	if (!s || !size)
-		return (0);
-	*size = 0;
-	while (s[*size] && s[*size] != c)
-		(*size)++;
-	return (s[*size] == c ? 1 : 0);
-}
-
-/*
-** Reallocates and cat a new str to a given str (only n chars + '\0')
-** Given str can be NULL and the return value will just be a copy of the str
-** to cat.
-** return 1 on success
-*/
-
-int		strncat_mal(char **s1, char *s2, size_t n)
-{
-	char	*new;
-	size_t	k;
-	size_t	i;
-
-	if (!s1)
-		return (0);
-	i = 0;
-	if (*s1)
-		i = ft_strlen(*s1);
-	if (!(new = (char *)malloc((i + n + 1) * sizeof(char))))
-		return (0);
-	k = 0;
-	while (*s1 && k < i)
-	{
-		new[k] = (*s1)[k];
-		k++;
-	}
-	new[k + n] = '\0';
-	while (s2 && n--)
-		new[k + n] = s2[n];
-	free(*s1);
-	*s1 = new;
-	return (1);
-}
 
 /*
 ** Return the a pointer on the fd corresponding to fd, and create one if none is
@@ -90,38 +41,26 @@ void	set_fd(t_list **l, char *str, int fd)
 	{
 		while (li->next)
 			li = li->next;
-		ft_putendl("OKK");
 		li->next = new;
 	}
 }
 
+int		check_fd(void *content, size_t size, void *comp)
+{
+	(void)size;
+	return (((t_fb *)content)->fd == *(int *)comp);
+}
+
 char	*del_fd(t_list **l, int fd)
 {
-	t_list	*prev;
+	t_fb	*last_occ;
 	char	*s;
-	t_list	*c;
 
-	prev = NULL;
-	while (l && *l)
-	{
-		if (((t_fb *)(*l)->content)->fd == fd)
-		{
-			if (prev) {
-				if (prev->next && prev->next->next)
-					prev->next = prev->next->next;
-				else
-					prev->next = NULL;
-			}
-			s = ((t_fb *)(*l)->content)->buff;
-			free((*l)->content);
-			free(*l);
-			*l = NULL;
-			return (s);
-		}
-		prev = *l;
-		*l = (*l)->next;
-	}
-	return (NULL);
+	if (!(last_occ = ft_lstdelif(l, &check_fd, &fd, NULL)))
+		return (NULL);
+	s = last_occ->buff;
+	free(last_occ);
+	return (s);
 }
 
 ssize_t	get_fd_str(char **str, t_list **l, int fd)
@@ -151,12 +90,11 @@ int		get_next_line(const int fd, char **line)
 		s = get_fd_str(&str, &states, fd);
 		if (s < 0)
 			return (-1);
-		if (strlen_bfrchr(str, '\n', (size_t *)&s))
+		if (ft_strlen_bfrchr(str, '\n', (size_t *)&s))
 		{
 			str[s] = '\0';
 			set_fd(&states, ft_strdup(str + s + 1), fd);
-			ft_putendl("ok");
-			if (!strncat_mal(line, str, (size_t)s))
+			if (!ft_strncat_mal(line, str, (size_t)s))
 			{
 				free(str);
 				return (-1);
@@ -169,7 +107,7 @@ int		get_next_line(const int fd, char **line)
 			free(str);
 			return (0);
 		}
-		if (!strncat_mal(line, str, s))
+		if (!ft_strncat_mal(line, str, s))
 		{
 			free(str);
 			return (-1);

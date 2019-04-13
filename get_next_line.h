@@ -6,7 +6,7 @@
 /*   By: tpotier <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/05 18:35:08 by tpotier           #+#    #+#             */
-/*   Updated: 2019/04/13 00:51:04 by tpotier          ###   ########.fr       */
+/*   Updated: 2019/04/13 01:45:03 by tpotier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <string.h>
 # include "libft.h"
 
-# define BUFF_SIZE 1
+# define BUFF_SIZE 32
 
 typedef struct	s_fb
 {
